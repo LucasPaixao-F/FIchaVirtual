@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Painel do Mestre</title>
+   <link rel="stylesheet" href="../css/style.css">
+   <style>
+      /* Estilos exclusivos do Painel do Mestre */
+      .painel-container {
+         max-width: 800px;
+         margin: 2rem auto;
+         padding: 1rem;
+      }
+
+      .grid-players {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+         gap: 20px;
+         margin-top: 20px;
+      }
+
+      .player-card {
+         background: white;
+         padding: 1.5rem;
+         border-radius: 8px;
+         border-left: 5px solid #007bff;
+         /* Detalhe azul */
+         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+         transition: transform 0.2s;
+      }
+
+      .player-card:hover {
+         transform: translateY(-5px);
+         /* Efeito de subir ao passar o mouse */
+      }
+
+      .player-card h3 {
+         margin: 0 0 10px 0;
+         color: #333;
+      }
+
+      .player-card p {
+         margin: 5px 0;
+         color: #666;
+         font-size: 0.9rem;
+      }
+
+      .tag-player {
+         background: #e9ecef;
+         padding: 2px 8px;
+         border-radius: 12px;
+         font-size: 0.8rem;
+         color: #495057;
+      }
+   </style>
+</head>
+
+<body>
+
+   <div class="painel-container">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+         <h2>🛡️ Painel do Mestre</h2>
+         <button onclick="window.location.href='../index.html'" style="width: auto; background: #dc3545;">Sair</button>
+      </div>
+
+      <p>Jogadores ativos na campanha:</p>
+
+      <div id="listaDeJogadores" class="grid-players"></div>
+   </div>
+
+   <script src="../js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Criar Ficha de Personagem</title>
+   <link rel="stylesheet" href="../css/style.css">
+   <style>
+      /* Estilo extra específico apenas para esta página */
+      .ficha-container {
+         max-width: 600px;
+         margin: 2rem auto;
+         background: white;
+         padding: 2rem;
+         border-radius: 8px;
+         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-grid {
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         /* Duas colunas */
+         gap: 15px;
+      }
+
+      .full-width {
+         grid-column: span 2;
+         /* Ocupa a largura toda */
+      }
+   </style>
+</head>
+
+<body>
+
+   <div class="ficha-container">
+      <h2>Nova Ficha de Personagem</h2>
+      <form id="fichaForm">
+
+         <div class="form-grid">
+            <div class="input-group full-width">
+               <label for="charName">Nome do Personagem</label>
+               <input type="text" id="charName" required>
+            </div>
+
+            <div class="input-group">
+               <label for="charClass">Classe</label>
+               <select id="charClass">
+                  <option value="guerreiro">Guerreiro</option>
+                  <option value="mago">Mago</option>
+                  <option value="ladino">Ladino</option>
+                  <option value="clerigo">Clérigo</option>
+               </select>
+            </div>
+
+            <div class="input-group">
+               <label for="charRace">Raça</label>
+               <select id="charRace">
+                  <option value="humano">Humano</option>
+                  <option value="elfo">Elfo</option>
+                  <option value="anao">Anão</option>
+                  <option value="orc">Orc</option>
+               </select>
+            </div>
+
+            <div class="input-group">
+               <label for="str">Força</label>
+               <input type="number" id="str" value="10" min="1" max="20">
+            </div>
+
+            <div class="input-group">
+               <label for="dex">Destreza</label>
+               <input type="number" id="dex" value="10" min="1" max="20">
+            </div>
+
+            <div class="input-group">
+               <label for="con">Constituição</label>
+               <input type="number" id="con" value="10" min="1" max="20">
+            </div>
+
+            <div class="input-group">
+               <label for="int">Inteligência</label>
+               <input type="number" id="int" value="10" min="1" max="20">
+            </div>
+            <div class="input-group">
+               <label for="int">Sabedoria</label>
+               <input type="number" id="int" value="10" min="1" max="20">
+            </div>
+            <div class="input-group">
+               <label for="cha">Carisma</label>
+               <input type="number" id="cha" value="10" min="1" max="20">
+            </div>
+         </div>
+
+         <button type="submit">Salvar Ficha</button>
+      </form>
+   </div>
+
+   <script src="../js/script.js"></script>
+</body>
+
+</html>

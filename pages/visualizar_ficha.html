@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Minha Ficha</title>
+   <link rel="stylesheet" href="../css/style.css">
+   <style>
+      /* Estilos exclusivos para visualização */
+      .ficha-card {
+         background: white;
+         padding: 2rem;
+         border-radius: 8px;
+         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+         max-width: 500px;
+         margin: 2rem auto;
+      }
+
+      .header-ficha {
+         text-align: center;
+         border-bottom: 2px solid #f0f2f5;
+         padding-bottom: 1rem;
+         margin-bottom: 1rem;
+      }
+
+      .header-ficha h2 {
+         margin: 0;
+         color: #333;
+      }
+
+      .sub-header {
+         color: #666;
+         font-style: italic;
+      }
+
+      .stats-grid {
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         gap: 10px;
+         margin-top: 1rem;
+      }
+
+      .stat-box {
+         background: #f8f9fa;
+         padding: 10px;
+         border-radius: 5px;
+         text-align: center;
+         border: 1px solid #dee2e6;
+      }
+
+      .stat-label {
+         display: block;
+         font-size: 0.8rem;
+         color: #666;
+      }
+
+      .stat-value {
+         font-size: 1.2rem;
+         font-weight: bold;
+         color: #007bff;
+      }
+
+      .btn-voltar {
+         background-color: #6c757d;
+         margin-top: 20px;
+      }
+
+      .btn-voltar:hover {
+         background-color: #5a6268;
+      }
+   </style>
+</head>
+
+<body>
+
+   <div class="ficha-card" id="visualizarFicha">
+      <div class="header-ficha">
+         <h2 id="viewName">Carregando...</h2>
+         <p class="sub-header">
+            <span id="viewRace">-</span> | <span id="viewClass">-</span>
+         </p>
+      </div>
+
+      <h3>Atributos</h3>
+      <div class="stats-grid">
+         <div class="stat-box">
+            <span class="stat-label">Força</span>
+            <div>
+               <span class="stat-value" id="viewStr">0</span>
+               <small id="modStr" style="color:#666; font-weight:normal;">(0)</small>
+            </div>
+         </div>
+      
+         <div class="stat-box">
+            <span class="stat-label">Destreza</span>
+            <div>
+               <span class="stat-value" id="viewDex">0</span>
+               <small id="modDex" style="color:#666; font-weight:normal;">(0)</small>
+            </div>
+         </div>
+      
+         <div class="stat-box">
+            <span class="stat-label">Constituição</span>
+            <div>
+               <span class="stat-value" id="viewCon">0</span>
+               <small id="modCon" style="color:#666; font-weight:normal;">(0)</small>
+            </div>
+         </div>
+      
+         <div class="stat-box">
+            <span class="stat-label">Inteligência</span>
+            <div>
+               <span class="stat-value" id="viewInt">0</span>
+               <small id="modInt" style="color:#666; font-weight:normal;">(0)</small>
+            </div>
+         </div>
+      
+         <div class="stat-box">
+            <span class="stat-label">Sabedoria</span>
+            <div>
+               <span class="stat-value" id="viewWis">0</span>
+               <small id="modWis" style="color:#666; font-weight:normal;">(0)</small>
+            </div>
+         </div>
+      
+         <div class="stat-box">
+            <span class="stat-label">Carisma</span>
+            <div>
+               <span class="stat-value" id="viewCha">0</span>
+               <small id="modCha" style="color:#666; font-weight:normal;">(0)</small>
+            </div>
+         </div>
+      </div>
+
+      <button class="btn-voltar" onclick="window.location.href='../index.html'">Sair</button>
+   </div>
+
+   <script src="../js/script.js"></script>
+</body>
+
+</html>
