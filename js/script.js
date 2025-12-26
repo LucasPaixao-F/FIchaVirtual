@@ -1,4 +1,4 @@
-// --- 1. BANCO DE DADOS ATUALIZADO ---
+// --- 1. BANCO DE DADOS ---
 const usuarios = [
     { email: "mestre@rpg.com", senha: "123", cargo: "mestre", temFicha: false },
     { email: "player1@rpg.com", senha: "123", cargo: "player", temFicha: true },
@@ -9,11 +9,13 @@ const usuarios = [
 const todasAsFichas = [
     { 
         dono: "player1@rpg.com", nome: "Aragorn", classe: "Guerreiro", raca: "Humano", nivel: 5,
-        atributos: { forca: 18, destreza: 14, constituicao: 16, inteligencia: 10, sabedoria: 12, carisma: 15 }
+        atributos: { forca: 18, destreza: 14, constituicao: 16, inteligencia: 10, sabedoria: 12, carisma: 15 },
+        proficiencias: ["chk_sur", "chk_ath", "chk_saveStr", "chk_saveCon"]
     },
     { 
-        dono: "player2@rpg.com", nome: "Legolas", classe: "Arqueiro", raca: "Elfo", nivel: 4,
-        atributos: { forca: 10, destreza: 20, constituicao: 12, inteligencia: 14, sabedoria: 16, carisma: 8 } 
+        dono: "player2@rpg.com", nome: "Legolas", classe: "Arqueiro", raca: "Elfo", nivel: 1, 
+        atributos: { forca: 10, destreza: 20, constituicao: 12, inteligencia: 14, sabedoria: 16, carisma: 8 },
+        proficiencias: ["chk_acro", "chk_ste", "chk_perc", "chk_saveDex"] 
     }
 ];
 
@@ -40,28 +42,12 @@ if (loginForm) {
     });
 }
 
-// --- 3. LÓGICA: CRIAR FICHA (Atualizada com novos campos) ---
+// --- 3. LÓGICA: CRIAR FICHA ---
 const fichaForm = document.getElementById('fichaForm');
 if (fichaForm) {
     fichaForm.addEventListener('submit', function(event) {
         event.preventDefault();
-        
-        // Simulação de captura dos novos dados
-        const novaFicha = {
-            nome: document.getElementById('charName').value,
-            // ... outros campos ...
-            atributos: {
-                forca: document.getElementById('str').value,
-                destreza: document.getElementById('dex').value,
-                constituicao: document.getElementById('con').value,
-                inteligencia: document.getElementById('int').value,
-                sabedoria: document.getElementById('wis').value, // NOVO
-                carisma: document.getElementById('cha').value   // NOVO
-            }
-        };
-
-        console.log("Ficha capturada:", novaFicha);
-        alert("Ficha criada com sucesso! (Verifique o console para ver os novos atributos)");
+        alert("Ficha criada com sucesso! (Simulação)");
     });
 }
 
@@ -73,42 +59,27 @@ if (visualizacao) {
     const minhaFicha = todasAsFichas.find(f => f.dono === userLogado.email);
 
     if (minhaFicha) {
-        // Cabeçalho
         document.getElementById('viewName').innerText = minhaFicha.nome;
         document.getElementById('viewClass').innerText = minhaFicha.classe;
         document.getElementById('viewRace').innerText = minhaFicha.raca;
-        
-        // Função auxiliar para atualizar Valor e Modificador ao mesmo tempo
+
+        document.getElementById('viewLevel').innerText = minhaFicha.nivel;
+        document.getElementById('viewProf').innerText = calcularProficiencia(minhaFicha.nivel);
+
+        // Atributos Principais
         atualizarAtributo('viewStr', 'modStr', minhaFicha.atributos.forca);
         atualizarAtributo('viewDex', 'modDex', minhaFicha.atributos.destreza);
         atualizarAtributo('viewCon', 'modCon', minhaFicha.atributos.constituicao);
         atualizarAtributo('viewInt', 'modInt', minhaFicha.atributos.inteligencia);
         atualizarAtributo('viewWis', 'modWis', minhaFicha.atributos.sabedoria);
         atualizarAtributo('viewCha', 'modCha', minhaFicha.atributos.carisma);
+
+        // --- CORREÇÃO AQUI ---
+        // Antes estava enviando 'minhaFicha.atributos', o que quebrava o código.
+        // Agora enviamos 'minhaFicha' inteira.
+        atualizarSkills(minhaFicha); 
     }
 }
-
-// --- FUNÇÕES AUXILIARES ---
-
-// 1. Calcula o modificador: (Valor - 10) / 2
-function calcularModificador(valor) {
-    const mod = Math.floor((valor - 10) / 2);
-    // Se for positivo, coloca um "+" na frente. Se for negativo, o JS já põe o "-" sozinho.
-    return mod >= 0 ? "+" + mod : mod;
-}
-
-// 2. Preenche o HTML do Valor Grande e do Modificador Pequeno
-function atualizarAtributo(idValor, idMod, valorAtributo) {
-    // Converte para número caso venha como texto do input
-    const valor = parseInt(valorAtributo); 
-    
-    // Atualiza o número grande
-    document.getElementById(idValor).innerText = valor;
-    
-    // Atualiza o modificador pequeno (ex: +3)
-    document.getElementById(idMod).innerText = `(${calcularModificador(valor)})`;
-}
-
 
 // --- 5. LÓGICA: PAINEL DO MESTRE ---
 const painelMestre = document.getElementById('listaDeJogadores');
@@ -127,4 +98,121 @@ if (painelMestre) {
         `;
         painelMestre.appendChild(card);
     });
+}
+
+// --- FUNÇÕES AUXILIARES ---
+
+function calcularModificador(valor) {
+    return Math.floor((valor - 10) / 2);
+}
+
+function calcularProficiencia(nivel) {
+    const prof = Math.floor((nivel - 1) / 4) + 2;
+    return "+" + prof;
+}
+
+function atualizarAtributo(idValor, idMod, valorAtributo) {
+    const valor = parseInt(valorAtributo); 
+    document.getElementById(idValor).innerText = valor;
+    
+    // --- CORREÇÃO VISUAL ---
+    // Adicionamos o "+" manualmente aqui para ficar bonito na tela (ex: +5)
+    const mod = calcularModificador(valor);
+    const textoMod = mod >= 0 ? "+" + mod : mod;
+    document.getElementById(idMod).innerText = `(${textoMod})`;
+}
+
+// FUNÇÃO PODEROSA DE SKILLS
+function atualizarSkills(ficha) {
+    const attr = ficha.atributos;
+    const profBonus = parseInt(calcularProficiencia(ficha.nivel));
+
+    // 1. Marca os checkboxes salvos
+    if (ficha.proficiencias) {
+        ficha.proficiencias.forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox) checkbox.checked = true;
+        });
+    }
+
+    // 2. Calcula Mods Base
+    const mods = {
+        str: calcularModificador(attr.forca),
+        dex: calcularModificador(attr.destreza),
+        con: calcularModificador(attr.constituicao),
+        int: calcularModificador(attr.inteligencia),
+        wis: calcularModificador(attr.sabedoria),
+        cha: calcularModificador(attr.carisma)
+    };
+
+    // 3. Atualiza a tabela
+    configurarLinha("saveStr", "chk_saveStr", mods.str, profBonus);
+    configurarLinha("saveDex", "chk_saveDex", mods.dex, profBonus);
+    configurarLinha("saveCon", "chk_saveCon", mods.con, profBonus);
+    configurarLinha("saveInt", "chk_saveInt", mods.int, profBonus);
+    configurarLinha("saveWis", "chk_saveWis", mods.wis, profBonus);
+    configurarLinha("saveCha", "chk_saveCha", mods.cha, profBonus);
+
+    configurarLinha("skillAcro", "chk_acro", mods.dex, profBonus);
+    configurarLinha("skillAni",  "chk_ani",  mods.wis, profBonus);
+    configurarLinha("skillArc",  "chk_arc",  mods.int, profBonus);
+    configurarLinha("skillAth",  "chk_ath",  mods.str, profBonus);
+    configurarLinha("skillDec",  "chk_dec",  mods.cha, profBonus);
+    configurarLinha("skillHis",  "chk_his",  mods.int, profBonus);
+    configurarLinha("skillIns",  "chk_ins",  mods.wis, profBonus);
+    configurarLinha("skillIntim","chk_intim",mods.cha, profBonus);
+    configurarLinha("skillInv",  "chk_inv",  mods.int, profBonus);
+    configurarLinha("skillMed",  "chk_med",  mods.wis, profBonus);
+    configurarLinha("skillNat",  "chk_nat",  mods.int, profBonus);
+    configurarLinha("skillPerc", "chk_perc", mods.wis, profBonus);
+    configurarLinha("skillPerf", "chk_perf", mods.cha, profBonus);
+    configurarLinha("skillPers", "chk_pers", mods.cha, profBonus);
+    configurarLinha("skillRel",  "chk_rel",  mods.int, profBonus);
+    configurarLinha("skillSle",  "chk_sle",  mods.dex, profBonus);
+    configurarLinha("skillSte",  "chk_ste",  mods.dex, profBonus);
+    configurarLinha("skillSur",  "chk_sur",  mods.wis, profBonus);
+}
+
+function configurarLinha(idTexto, idCheckbox, modBase, profBonus) {
+    const elTexto = document.getElementById(idTexto);
+    const elCheck = document.getElementById(idCheckbox);
+    
+    // Proteção: Se o HTML não tiver o ID, para a execução desse item sem travar o resto
+    if (!elTexto) return;
+
+    let nomePericia = "Teste";
+    if (elTexto.previousElementSibling && elTexto.previousElementSibling.className === "skill-name") {
+        nomePericia = elTexto.previousElementSibling.innerText;
+    }
+
+    function calcular() {
+        let valorFinal = parseInt(modBase); 
+        // Verifica se o checkbox existe antes de checar se está marcado
+        if (elCheck && elCheck.checked) {
+            valorFinal += profBonus; 
+        }
+        
+        const textoFinal = valorFinal >= 0 ? "+" + valorFinal : valorFinal;
+        elTexto.innerText = textoFinal;
+        elTexto.style.color = (elCheck && elCheck.checked) ? "#0056b3" : "#007bff";
+
+        // Adiciona Rolagem de Dados
+        elTexto.onclick = function() {
+            rolarDado(nomePericia, valorFinal);
+        };
+    }
+
+    calcular();
+    if (elCheck) elCheck.addEventListener('change', calcular);
+}
+
+function rolarDado(nome, modificador) {
+    const d20 = Math.floor(Math.random() * 20) + 1;
+    const total = d20 + modificador;
+    
+    let msg = "";
+    if (d20 === 20) msg = " 🔥 CRÍTICO!";
+    if (d20 === 1) msg = " 💀 FALHA CRÍTICA!";
+
+    alert(`🎲 Rolando ${nome}:\n\nDado: ${d20}\nModificador: ${modificador}\n\nRESULTADO: ${total}${msg}`);
 }

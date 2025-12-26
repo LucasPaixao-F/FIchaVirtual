@@ -7,7 +7,19 @@
    <title>Minha Ficha</title>
    <link rel="stylesheet" href="../css/style.css">
    <style>
-      /* Estilos exclusivos para visualização */
+      /* Novo estilo para a lista de perícias */
+      .combat-grid {
+         display: grid;
+         grid-template-columns: 1fr 1fr; /* Duas colunas */
+         gap: 20px;
+         margin-top: 2rem;
+         text-align: left;
+      }
+      .list-section h4 { border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; color: #333; }
+      .skill-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #eee; }
+      .skill-name { color: #555; font-size: 0.9rem; }
+      .skill-mod { font-weight: bold; color: #007bff; }
+
       .ficha-card {
          background: white;
          padding: 2rem;
@@ -77,9 +89,19 @@
    <div class="ficha-card" id="visualizarFicha">
       <div class="header-ficha">
          <h2 id="viewName">Carregando...</h2>
+      
          <p class="sub-header">
             <span id="viewRace">-</span> | <span id="viewClass">-</span>
          </p>
+      
+         <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px;">
+            <div style="background: #333; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">
+               Nível <strong id="viewLevel">1</strong>
+            </div>
+            <div style="background: #007bff; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;">
+               Proficiência: <strong id="viewProf">+2</strong>
+            </div>
+         </div>
       </div>
 
       <h3>Atributos</h3>
@@ -130,6 +152,76 @@
                <span class="stat-value" id="viewCha">0</span>
                <small id="modCha" style="color:#666; font-weight:normal;">(0)</small>
             </div>
+         </div>
+      </div>
+
+      <div class="combat-grid">
+         <div class="list-section">
+            <h4>Saving Throws</h4>
+            <div class="skill-row">
+               <input type="checkbox" id="chk_saveStr" class="prof-check">
+               <span class="skill-name">Strength</span> <span class="skill-mod" id="saveStr">0</span>
+            </div>
+            <div class="skill-row">
+               <input type="checkbox" id="chk_saveDex" class="prof-check">
+               <span class="skill-name">Dexterity</span> <span class="skill-mod" id="saveDex">0</span>
+            </div>
+            <div class="skill-row">
+               <input type="checkbox" id="chk_saveCon" class="prof-check">
+               <span class="skill-name">Constitution</span> <span class="skill-mod" id="saveCon">0</span>
+            </div>
+            <div class="skill-row">
+               <input type="checkbox" id="chk_saveInt" class="prof-check">
+               <span class="skill-name">Intelligence</span> <span class="skill-mod" id="saveInt">0</span>
+            </div>
+            <div class="skill-row">
+               <input type="checkbox" id="chk_saveWis" class="prof-check">
+               <span class="skill-name">Wisdom</span> <span class="skill-mod" id="saveWis">0</span>
+            </div>
+            <div class="skill-row">
+               <input type="checkbox" id="chk_saveCha" class="prof-check">
+               <span class="skill-name">Charisma</span> <span class="skill-mod" id="saveCha">0</span>
+            </div>
+         </div>
+      
+         <div class="list-section">
+            <h4>Skills</h4>
+            <div class="skill-row"><input type="checkbox" id="chk_acro" class="prof-check"><span class="skill-name">Acrobatics
+                  (Dex)</span> <span class="skill-mod" id="skillAcro">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_ani" class="prof-check"><span class="skill-name">Animal
+                  Handling (Wis)</span> <span class="skill-mod" id="skillAni">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_arc" class="prof-check"><span class="skill-name">Arcana
+                  (Int)</span> <span class="skill-mod" id="skillArc">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_ath" class="prof-check"><span class="skill-name">Athletics
+                  (Str)</span> <span class="skill-mod" id="skillAth">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_dec" class="prof-check"><span class="skill-name">Deception
+                  (Cha)</span> <span class="skill-mod" id="skillDec">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_his" class="prof-check"><span class="skill-name">History
+                  (Int)</span> <span class="skill-mod" id="skillHis">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_ins" class="prof-check"><span class="skill-name">Insight
+                  (Wis)</span> <span class="skill-mod" id="skillIns">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_intim" class="prof-check"><span
+                  class="skill-name">Intimidation (Cha)</span> <span class="skill-mod" id="skillIntim">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_inv" class="prof-check"><span
+                  class="skill-name">Investigation (Int)</span> <span class="skill-mod" id="skillInv">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_med" class="prof-check"><span class="skill-name">Medicine
+                  (Wis)</span> <span class="skill-mod" id="skillMed">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_nat" class="prof-check"><span class="skill-name">Nature
+                  (Int)</span> <span class="skill-mod" id="skillNat">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_perc" class="prof-check"><span class="skill-name">Perception
+                  (Wis)</span> <span class="skill-mod" id="skillPerc">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_perf" class="prof-check"><span
+                  class="skill-name">Performance (Cha)</span> <span class="skill-mod" id="skillPerf">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_pers" class="prof-check"><span class="skill-name">Persuasion
+                  (Cha)</span> <span class="skill-mod" id="skillPers">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_rel" class="prof-check"><span class="skill-name">Religion
+                  (Int)</span> <span class="skill-mod" id="skillRel">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_sle" class="prof-check"><span class="skill-name">Sleight of
+                  Hand (Dex)</span> <span class="skill-mod" id="skillSle">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_ste" class="prof-check"><span class="skill-name">Stealth
+                  (Dex)</span> <span class="skill-mod" id="skillSte">0</span></div>
+            <div class="skill-row"><input type="checkbox" id="chk_sur" class="prof-check"><span class="skill-name">Survival
+                  (Wis)</span> <span class="skill-mod" id="skillSur">0</span></div>
          </div>
       </div>
 

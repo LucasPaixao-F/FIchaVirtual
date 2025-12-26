@@ -1,20 +1,64 @@
 body {
    font-family: Arial, sans-serif;
    background-color: #f0f2f5;
+   min-height: 100vh;
    display: flex;
    justify-content: center;
-   align-items: center;
-   height: 100vh;
+   align-items: flex-start;
    margin: 0;
+   padding: 2rem 0;
+   box-sizing: border-box;
 }
 
-.login-container {
+.login-container,
+.ficha-card {
+   margin: auto;
    background-color: white;
    padding: 2rem;
    border-radius: 8px;
    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
    width: 100%;
-   max-width: 350px;
+   max-width: 500px;
+}
+
+h2 {
+   text-align: center;
+   color: #333;
+   margin-bottom: 1.5rem;
+}
+
+.input-group {
+   margin-bottom: 1rem;
+}
+
+label {
+   display: block;
+   margin-bottom: 0.5rem;
+   color: #666;
+}
+
+input {
+   width: 100%;
+   padding: 10px;
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   box-sizing: border-box;
+}
+
+button {
+   width: 100%;
+   padding: 10px;
+   background-color: #007bff;
+   color: white;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+   font-size: 16px;
+   margin-top: 10px;
+}
+
+button:hover {
+   background-color: #0056b3;
 }
 
 h2 {
@@ -56,4 +100,88 @@ button {
 
 button:hover {
    background-color: #0056b3;
+}
+
+/* Torna os modificadores clicáveis e interativos */
+.skill-mod,
+.stat-value {
+   cursor: pointer;
+   transition: color 0.2s;
+   text-decoration: underline dotted;
+   /* Uma linha sutil embaixo */
+}
+
+.skill-mod:hover,
+.stat-value:hover {
+   color: #ff9800 !important;
+   /* Fica laranja ao passar o mouse */
+}
+/* --- ESTILOS DAS PERÍCIAS E SAVES --- */
+
+.combat-grid {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   /* Duas colunas */
+   gap: 30px;
+   /* Aumentei o espaço entre as colunas */
+   margin-top: 2rem;
+   text-align: left;
+}
+
+.list-section h4 {
+   border-bottom: 2px solid #f0f2f5;
+   padding-bottom: 10px;
+   margin-bottom: 15px;
+   color: #333;
+   text-transform: uppercase;
+   font-size: 0.85rem;
+   letter-spacing: 1px;
+}
+
+/* A LINHA MÁGICA: Alinha tudo no centro verticalmente */
+.skill-row {
+   display: flex;
+   align-items: center;
+   /* Garante que checkbox, texto e número fiquem na mesma linha */
+   justify-content: space-between;
+   padding: 8px 0;
+   /* Mais espaço para respirar */
+   border-bottom: 1px solid #f0f0f0;
+}
+
+/* O CHECKBOX: Tamanho fixo para não deformar */
+.prof-check {
+   width: 18px;
+   height: 18px;
+   margin-right: 10px;
+   cursor: pointer;
+   accent-color: #007bff;
+   /* Deixa o "check" azul combinando com o site */
+   flex-shrink: 0;
+   /* Impede que o checkbox seja esmagado se o texto for grande */
+}
+
+/* O NOME DA PERÍCIA */
+.skill-name {
+   flex-grow: 1;
+   /* Ocupa todo o espaço disponível no meio */
+   color: #555;
+   font-size: 0.9rem;
+   line-height: 1.2;
+   /* Melhora a leitura quando quebra linha */
+}
+
+/* O NÚMERO (MODIFICADOR) */
+.skill-mod {
+   font-weight: bold;
+   color: #007bff;
+   min-width: 35px;
+   /* Reserva espaço fixo para alinhar a coluna da direita */
+   text-align: right;
+   cursor: pointer;
+}
+
+/* Efeito ao passar o mouse na linha inteira */
+.skill-row:hover {
+   background-color: #fafafa;
 }
