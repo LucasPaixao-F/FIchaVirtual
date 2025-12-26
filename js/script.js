@@ -56,32 +56,34 @@ const visualizacao = document.getElementById('visualizarFicha');
 
 if (visualizacao) {
     const userLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
-    const minhaFicha = todasAsFichas.find(f => f.dono === userLogado.email);
+    
+    if(!userLogado) {
+        console.log("Nenhum usuário logado.");
+    } else {
+        const minhaFicha = todasAsFichas.find(f => f.dono === userLogado.email);
 
-    if (minhaFicha) {
-        document.getElementById('viewName').innerText = minhaFicha.nome;
-        document.getElementById('viewClass').innerText = minhaFicha.classe;
-        document.getElementById('viewRace').innerText = minhaFicha.raca;
+        if (minhaFicha) {
+            document.getElementById('viewName').innerText = minhaFicha.nome;
+            document.getElementById('viewClass').innerText = minhaFicha.classe;
+            document.getElementById('viewRace').innerText = minhaFicha.raca;
 
-        document.getElementById('viewLevel').innerText = minhaFicha.nivel;
-        document.getElementById('viewProf').innerText = calcularProficiencia(minhaFicha.nivel);
+            document.getElementById('viewLevel').innerText = minhaFicha.nivel;
+            document.getElementById('viewProf').innerText = calcularProficiencia(minhaFicha.nivel);
 
-        // Atributos Principais
-        atualizarAtributo('viewStr', 'modStr', minhaFicha.atributos.forca);
-        atualizarAtributo('viewDex', 'modDex', minhaFicha.atributos.destreza);
-        atualizarAtributo('viewCon', 'modCon', minhaFicha.atributos.constituicao);
-        atualizarAtributo('viewInt', 'modInt', minhaFicha.atributos.inteligencia);
-        atualizarAtributo('viewWis', 'modWis', minhaFicha.atributos.sabedoria);
-        atualizarAtributo('viewCha', 'modCha', minhaFicha.atributos.carisma);
+            // AGORA PASSAMOS O NOME DO ATRIBUTO PARA O ALERTA FICAR BONITO
+            atualizarAtributo('viewStr', 'modStr', minhaFicha.atributos.forca, "Força");
+            atualizarAtributo('viewDex', 'modDex', minhaFicha.atributos.destreza, "Destreza");
+            atualizarAtributo('viewCon', 'modCon', minhaFicha.atributos.constituicao, "Constituição");
+            atualizarAtributo('viewInt', 'modInt', minhaFicha.atributos.inteligencia, "Inteligência");
+            atualizarAtributo('viewWis', 'modWis', minhaFicha.atributos.sabedoria, "Sabedoria");
+            atualizarAtributo('viewCha', 'modCha', minhaFicha.atributos.carisma, "Carisma");
 
-        // --- CORREÇÃO AQUI ---
-        // Antes estava enviando 'minhaFicha.atributos', o que quebrava o código.
-        // Agora enviamos 'minhaFicha' inteira.
-        atualizarSkills(minhaFicha); 
+            atualizarSkills(minhaFicha); 
+        }
     }
 }
 
-// --- 5. LÓGICA: PAINEL DO MESTRE ---
+// --- 5. PAINEL DO MESTRE ---
 const painelMestre = document.getElementById('listaDeJogadores');
 if (painelMestre) {
     painelMestre.innerHTML = '';
@@ -111,23 +113,37 @@ function calcularProficiencia(nivel) {
     return "+" + prof;
 }
 
-function atualizarAtributo(idValor, idMod, valorAtributo) {
+// ATUALIZADA: Agora aceita clique nos atributos principais também!
+function atualizarAtributo(idValor, idMod, valorAtributo, nomeAtributo) {
     const valor = parseInt(valorAtributo); 
-    document.getElementById(idValor).innerText = valor;
+    const elValorGrande = document.getElementById(idValor);
+    const elModPequeno = document.getElementById(idMod);
+
+    // Atualiza números
+    elValorGrande.innerText = valor;
     
-    // --- CORREÇÃO VISUAL ---
-    // Adicionamos o "+" manualmente aqui para ficar bonito na tela (ex: +5)
     const mod = calcularModificador(valor);
     const textoMod = mod >= 0 ? "+" + mod : mod;
-    document.getElementById(idMod).innerText = `(${textoMod})`;
+    elModPequeno.innerText = `(${textoMod})`;
+
+    // ADICIONA O CLIQUE (ROLAGEM)
+    // Se clicar no número grande ou no pequeno, rola o dado
+    elValorGrande.style.cursor = "pointer";
+    elModPequeno.style.cursor = "pointer";
+    elValorGrande.title = "Clique para rolar";
+
+    const funcaoRolar = function() {
+        rolarDado(nomeAtributo, mod);
+    };
+
+    elValorGrande.onclick = funcaoRolar;
+    elModPequeno.onclick = funcaoRolar;
 }
 
-// FUNÇÃO PODEROSA DE SKILLS
 function atualizarSkills(ficha) {
     const attr = ficha.atributos;
     const profBonus = parseInt(calcularProficiencia(ficha.nivel));
 
-    // 1. Marca os checkboxes salvos
     if (ficha.proficiencias) {
         ficha.proficiencias.forEach(id => {
             const checkbox = document.getElementById(id);
@@ -135,7 +151,6 @@ function atualizarSkills(ficha) {
         });
     }
 
-    // 2. Calcula Mods Base
     const mods = {
         str: calcularModificador(attr.forca),
         dex: calcularModificador(attr.destreza),
@@ -145,7 +160,6 @@ function atualizarSkills(ficha) {
         cha: calcularModificador(attr.carisma)
     };
 
-    // 3. Atualiza a tabela
     configurarLinha("saveStr", "chk_saveStr", mods.str, profBonus);
     configurarLinha("saveDex", "chk_saveDex", mods.dex, profBonus);
     configurarLinha("saveCon", "chk_saveCon", mods.con, profBonus);
@@ -177,17 +191,19 @@ function configurarLinha(idTexto, idCheckbox, modBase, profBonus) {
     const elTexto = document.getElementById(idTexto);
     const elCheck = document.getElementById(idCheckbox);
     
-    // Proteção: Se o HTML não tiver o ID, para a execução desse item sem travar o resto
     if (!elTexto) return;
 
-    let nomePericia = "Teste";
+    let nomePericia = "Teste de Perícia";
+    // Tenta achar o nome da perícia no HTML (o span anterior)
     if (elTexto.previousElementSibling && elTexto.previousElementSibling.className === "skill-name") {
         nomePericia = elTexto.previousElementSibling.innerText;
+    } else if (elTexto.previousElementSibling && elTexto.previousElementSibling.previousElementSibling) {
+        // Caso tenha o checkbox no meio
+         nomePericia = elTexto.previousElementSibling.previousElementSibling.innerText;
     }
 
     function calcular() {
         let valorFinal = parseInt(modBase); 
-        // Verifica se o checkbox existe antes de checar se está marcado
         if (elCheck && elCheck.checked) {
             valorFinal += profBonus; 
         }
@@ -196,7 +212,7 @@ function configurarLinha(idTexto, idCheckbox, modBase, profBonus) {
         elTexto.innerText = textoFinal;
         elTexto.style.color = (elCheck && elCheck.checked) ? "#0056b3" : "#007bff";
 
-        // Adiciona Rolagem de Dados
+        // CONFIGURA O CLIQUE
         elTexto.onclick = function() {
             rolarDado(nomePericia, valorFinal);
         };
@@ -207,6 +223,7 @@ function configurarLinha(idTexto, idCheckbox, modBase, profBonus) {
 }
 
 function rolarDado(nome, modificador) {
+    console.log("Tentando rolar:", nome); // Debug no console
     const d20 = Math.floor(Math.random() * 20) + 1;
     const total = d20 + modificador;
     
