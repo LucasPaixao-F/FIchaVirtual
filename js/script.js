@@ -1,235 +1,323 @@
-// --- 1. BANCO DE DADOS ---
-const usuarios = [
-    { email: "mestre@rpg.com", senha: "123", cargo: "mestre", temFicha: false },
-    { email: "player1@rpg.com", senha: "123", cargo: "player", temFicha: true },
-    { email: "player2@rpg.com", senha: "123", cargo: "player", temFicha: true },
-    { email: "novato@rpg.com", senha: "123", cargo: "player", temFicha: false }
-];
+// --- 1. CONFIGURAÇÃO DO FIREBASE ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const todasAsFichas = [
-    { 
-        dono: "player1@rpg.com", nome: "Aragorn", classe: "Guerreiro", raca: "Humano", nivel: 5,
-        atributos: { forca: 18, destreza: 14, constituicao: 16, inteligencia: 10, sabedoria: 12, carisma: 15 },
-        proficiencias: ["chk_sur", "chk_ath", "chk_saveStr", "chk_saveCon"]
-    },
-    { 
-        dono: "player2@rpg.com", nome: "Legolas", classe: "Arqueiro", raca: "Elfo", nivel: 1, 
-        atributos: { forca: 10, destreza: 20, constituicao: 12, inteligencia: 14, sabedoria: 16, carisma: 8 },
-        proficiencias: ["chk_acro", "chk_ste", "chk_perc", "chk_saveDex"] 
-    }
-];
+const firebaseConfig = {
+  apiKey: "AIzaSyBiJxD6N-Y4tbEBBMM_RBCSOXuYpXEXMb0",
+  authDomain: "fichavirtual-22960.firebaseapp.com",
+  projectId: "fichavirtual-22960",
+  storageBucket: "fichavirtual-22960.firebasestorage.app",
+  messagingSenderId: "62340314104",
+  appId: "1:62340314104:web:b15719eaca7365bf841c0d"
+};
 
-// --- 2. LÓGICA DE LOGIN ---
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Variáveis Globais
+let editando = false;
+let idFichaAtual = null; 
+
+// --- 2. CADASTRO ---
+const cadastroForm = document.getElementById('cadastroForm');
+if (cadastroForm) {
+    cadastroForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('regEmail').value.trim();
+        const pass = document.getElementById('regPass').value.trim();
+
+        try {
+            const q = query(collection(db, "usuarios"), where("email", "==", email));
+            const snap = await getDocs(q);
+            if (!snap.empty) { alert("E-mail já existe!"); return; }
+
+            await addDoc(collection(db, "usuarios"), { email, senha: pass, cargo: "player", temFicha: false });
+            
+            localStorage.setItem('usuarioLogado', JSON.stringify({ email, cargo: "player", temFicha: false }));
+            alert("Conta criada!");
+            window.location.href = "pages/criar_ficha.html";
+        } catch (error) { console.error(error); alert("Erro ao cadastrar."); }
+    });
+}
+
+// --- 3. LOGIN ---
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        const user = usuarios.find(u => u.email === email && u.senha === pass);
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('password').value.trim();
 
-        if (!user) { alert("Dados incorretos!"); return; }
+        try {
+            const q = query(collection(db, "usuarios"), where("email", "==", email), where("senha", "==", pass));
+            const snap = await getDocs(q);
 
-        localStorage.setItem('usuarioLogado', JSON.stringify(user));
+            if (snap.empty) { alert("Dados incorretos!"); return; }
 
-        if (user.cargo === 'mestre') {
-            window.location.href = "pages/painel_mestre.html";
-        } else if (user.temFicha) {
-            window.location.href = "pages/visualizar_ficha.html";
-        } else {
-            window.location.href = "pages/criar_ficha.html";
-        }
+            const user = snap.docs[0].data();
+            localStorage.setItem('usuarioLogado', JSON.stringify(user));
+
+            if (user.cargo === 'mestre') window.location.href = "pages/painel_mestre.html";
+            else if (user.temFicha) window.location.href = "pages/visualizar_ficha.html";
+            else window.location.href = "pages/criar_ficha.html";
+        } catch (error) { console.error(error); alert("Erro de conexão."); }
     });
 }
 
-// --- 3. LÓGICA: CRIAR FICHA ---
+// --- 4. CRIAR FICHA ---
 const fichaForm = document.getElementById('fichaForm');
 if (fichaForm) {
-    fichaForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        alert("Ficha criada com sucesso! (Simulação)");
+    fichaForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+        if (!user) return;
+
+        const novaFicha = {
+            dono: user.email,
+            nome: document.getElementById('charName').value,
+            classe: document.getElementById('charClass').value,
+            raca: document.getElementById('charRace').value,
+            nivel: 1, proficiencias: [],
+            atributos: {
+                forca: document.getElementById('str').value,
+                destreza: document.getElementById('dex').value,
+                constituicao: document.getElementById('con').value,
+                inteligencia: document.getElementById('int').value,
+                sabedoria: document.getElementById('wis').value,
+                carisma: document.getElementById('cha').value
+            }
+        };
+
+        try {
+            await addDoc(collection(db, "fichas"), novaFicha);
+            
+            const q = query(collection(db, "usuarios"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                await updateDoc(doc(db, "usuarios", snap.docs[0].id), { temFicha: true });
+                user.temFicha = true;
+                localStorage.setItem('usuarioLogado', JSON.stringify(user));
+            }
+            window.location.href = "visualizar_ficha.html";
+        } catch (error) { console.error(error); }
     });
 }
 
-// --- 4. LÓGICA: VISUALIZAR FICHA ---
-const visualizacao = document.getElementById('visualizarFicha');
-
-if (visualizacao) {
-    const userLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
-    
-    if(!userLogado) {
-        console.log("Nenhum usuário logado.");
-    } else {
-        const minhaFicha = todasAsFichas.find(f => f.dono === userLogado.email);
-
-        if (minhaFicha) {
-            document.getElementById('viewName').innerText = minhaFicha.nome;
-            document.getElementById('viewClass').innerText = minhaFicha.classe;
-            document.getElementById('viewRace').innerText = minhaFicha.raca;
-
-            document.getElementById('viewLevel').innerText = minhaFicha.nivel;
-            document.getElementById('viewProf').innerText = calcularProficiencia(minhaFicha.nivel);
-
-            // AGORA PASSAMOS O NOME DO ATRIBUTO PARA O ALERTA FICAR BONITO
-            atualizarAtributo('viewStr', 'modStr', minhaFicha.atributos.forca, "Força");
-            atualizarAtributo('viewDex', 'modDex', minhaFicha.atributos.destreza, "Destreza");
-            atualizarAtributo('viewCon', 'modCon', minhaFicha.atributos.constituicao, "Constituição");
-            atualizarAtributo('viewInt', 'modInt', minhaFicha.atributos.inteligencia, "Inteligência");
-            atualizarAtributo('viewWis', 'modWis', minhaFicha.atributos.sabedoria, "Sabedoria");
-            atualizarAtributo('viewCha', 'modCha', minhaFicha.atributos.carisma, "Carisma");
-
-            atualizarSkills(minhaFicha); 
-        }
-    }
+// --- 5. VISUALIZAR FICHA ---
+const telaFicha = document.getElementById('visualizarFicha');
+if (telaFicha) {
+    carregarFicha();
+    const btnEditar = document.getElementById('btnEditar');
+    if(btnEditar) btnEditar.addEventListener('click', alternarEdicao);
 }
 
-// --- 5. PAINEL DO MESTRE ---
+async function carregarFicha() {
+    const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+    if (!user) return;
+
+    try {
+        const q = query(collection(db, "fichas"), where("dono", "==", user.email));
+        const snap = await getDocs(q);
+
+        if (!snap.empty) {
+            const docRef = snap.docs[0];
+            idFichaAtual = docRef.id; 
+            const ficha = docRef.data();
+            preencherTela(ficha);
+        }
+    } catch (error) { console.error(error); }
+}
+
+function preencherTela(ficha) {
+    document.getElementById('viewName').innerText = ficha.nome;
+    document.getElementById('viewClass').innerText = ficha.classe;
+    document.getElementById('viewRace').innerText = ficha.raca;
+    document.getElementById('viewLevel').innerText = ficha.nivel;
+    document.getElementById('viewProf').innerText = calcularProficiencia(ficha.nivel);
+
+    renderizarAtributo('viewStr', 'modStr', ficha.atributos.forca, "Força");
+    renderizarAtributo('viewDex', 'modDex', ficha.atributos.destreza, "Destreza");
+    renderizarAtributo('viewCon', 'modCon', ficha.atributos.constituicao, "Constituição");
+    renderizarAtributo('viewInt', 'modInt', ficha.atributos.inteligencia, "Inteligência");
+    renderizarAtributo('viewWis', 'modWis', ficha.atributos.sabedoria, "Sabedoria");
+    renderizarAtributo('viewCha', 'modCha', ficha.atributos.carisma, "Carisma");
+
+    atualizarSkills(ficha);
+}
+
+// --- 6. PAINEL DO MESTRE ---
 const painelMestre = document.getElementById('listaDeJogadores');
 if (painelMestre) {
-    painelMestre.innerHTML = '';
-    todasAsFichas.forEach(ficha => {
-        const card = document.createElement('div');
-        card.className = 'player-card';
-        card.innerHTML = `
-            <h3>${ficha.nome}</h3>
-            <p><strong>Classe:</strong> ${ficha.classe} (Nv. ${ficha.nivel})</p>
-            <p><strong>Raça:</strong> ${ficha.raca}</p>
-            <div style="margin-top:10px;">
-                <span class="tag-player">Jog: ${ficha.dono}</span>
-            </div>
-        `;
-        painelMestre.appendChild(card);
+    onSnapshot(collection(db, "fichas"), (snap) => {
+        painelMestre.innerHTML = '';
+        snap.forEach((d) => {
+            const f = d.data();
+            const card = document.createElement('div');
+            card.className = 'player-card';
+            card.innerHTML = `<h3>${f.nome}</h3><p>${f.classe} (Nv. ${f.nivel})</p><p>${f.raca}</p><span class="tag-player">${f.dono}</span>`;
+            painelMestre.appendChild(card);
+        });
     });
 }
 
 // --- FUNÇÕES AUXILIARES ---
 
-function calcularModificador(valor) {
-    return Math.floor((valor - 10) / 2);
-}
-
-function calcularProficiencia(nivel) {
-    const prof = Math.floor((nivel - 1) / 4) + 2;
-    return "+" + prof;
-}
-
-// ATUALIZADA: Agora aceita clique nos atributos principais também!
-function atualizarAtributo(idValor, idMod, valorAtributo, nomeAtributo) {
-    const valor = parseInt(valorAtributo); 
-    const elValorGrande = document.getElementById(idValor);
-    const elModPequeno = document.getElementById(idMod);
-
-    // Atualiza números
-    elValorGrande.innerText = valor;
+async function alternarEdicao() {
+    const btn = document.getElementById('btnEditar');
     
-    const mod = calcularModificador(valor);
-    const textoMod = mod >= 0 ? "+" + mod : mod;
-    elModPequeno.innerText = `(${textoMod})`;
+    if (!editando) {
+        editando = true;
+        btn.innerText = "💾 Salvar";
+        btn.style.backgroundColor = "#28a745";
+        btn.style.color = "white";
+        carregarFicha(); 
+    } else {
+        if (!idFichaAtual) return;
+        btn.innerText = "⏳ ...";
+        
+        try {
+            const novosAtributos = {
+                forca: document.getElementById('input_viewStr').value,
+                destreza: document.getElementById('input_viewDex').value,
+                constituicao: document.getElementById('input_viewCon').value,
+                inteligencia: document.getElementById('input_viewInt').value,
+                sabedoria: document.getElementById('input_viewWis').value,
+                carisma: document.getElementById('input_viewCha').value
+            };
 
-    // ADICIONA O CLIQUE (ROLAGEM)
-    // Se clicar no número grande ou no pequeno, rola o dado
-    elValorGrande.style.cursor = "pointer";
-    elModPequeno.style.cursor = "pointer";
-    elValorGrande.title = "Clique para rolar";
-
-    const funcaoRolar = function() {
-        rolarDado(nomeAtributo, mod);
-    };
-
-    elValorGrande.onclick = funcaoRolar;
-    elModPequeno.onclick = funcaoRolar;
+            await updateDoc(doc(db, "fichas", idFichaAtual), { atributos: novosAtributos });
+            
+            editando = false;
+            btn.innerText = "✏️ Editar";
+            btn.style.backgroundColor = "#ffc107";
+            btn.style.color = "#333";
+            carregarFicha();
+            alert("Atributos salvos!");
+        } catch (error) { console.error(error); alert("Erro ao salvar."); editando = false; }
+    }
 }
 
+function calcularModificador(valor) { return Math.floor((valor - 10) / 2); }
+function calcularProficiencia(nivel) { return "+" + (Math.floor((nivel - 1) / 4) + 2); }
+
+function renderizarAtributo(idVal, idMod, valor, nome) {
+    const elVal = document.getElementById(idVal);
+    const elMod = document.getElementById(idMod);
+    const val = parseInt(valor);
+    const mod = calcularModificador(val);
+    const txtMod = mod >= 0 ? "+" + mod : mod;
+
+    if (editando) {
+        elVal.innerHTML = `<input type="number" id="input_${idVal}" class="input-atributo" value="${val}">`;
+        elVal.onclick = null; elMod.onclick = null;
+    } else {
+        elVal.innerHTML = val;
+        elVal.style.cursor = "pointer"; elMod.style.cursor = "pointer";
+        elVal.onclick = () => rolarDado(nome, mod);
+        elMod.onclick = () => rolarDado(nome, mod);
+    }
+    elMod.innerText = `(${txtMod})`;
+}
+
+// --- CÁLCULO DE PERÍCIAS ---
 function atualizarSkills(ficha) {
     const attr = ficha.atributos;
-    const profBonus = parseInt(calcularProficiencia(ficha.nivel));
+    const prof = parseInt(calcularProficiencia(ficha.nivel));
 
     if (ficha.proficiencias) {
         ficha.proficiencias.forEach(id => {
-            const checkbox = document.getElementById(id);
-            if (checkbox) checkbox.checked = true;
+            const el = document.getElementById(id);
+            if(el) el.checked = true;
         });
     }
 
     const mods = {
-        str: calcularModificador(attr.forca),
-        dex: calcularModificador(attr.destreza),
-        con: calcularModificador(attr.constituicao),
-        int: calcularModificador(attr.inteligencia),
-        wis: calcularModificador(attr.sabedoria),
-        cha: calcularModificador(attr.carisma)
+        str: calcularModificador(attr.forca), dex: calcularModificador(attr.destreza),
+        con: calcularModificador(attr.constituicao), int: calcularModificador(attr.inteligencia),
+        wis: calcularModificador(attr.sabedoria), cha: calcularModificador(attr.carisma)
     };
+    
+    const lista = [
+        ["saveStr", "chk_saveStr", mods.str], ["saveDex", "chk_saveDex", mods.dex],
+        ["saveCon", "chk_saveCon", mods.con], ["saveInt", "chk_saveInt", mods.int],
+        ["saveWis", "chk_saveWis", mods.wis], ["saveCha", "chk_saveCha", mods.cha],
+        ["skillAcro", "chk_acro", mods.dex], ["skillAni", "chk_ani", mods.wis],
+        ["skillArc", "chk_arc", mods.int], ["skillAth", "chk_ath", mods.str],
+        ["skillDec", "chk_dec", mods.cha], ["skillHis", "chk_his", mods.int],
+        ["skillIns", "chk_ins", mods.wis], ["skillIntim", "chk_intim", mods.cha],
+        ["skillInv", "chk_inv", mods.int], ["skillMed", "chk_med", mods.wis],
+        ["skillNat", "chk_nat", mods.int], ["skillPerc", "chk_perc", mods.wis],
+        ["skillPerf", "chk_perf", mods.cha], ["skillPers", "chk_pers", mods.cha],
+        ["skillRel", "chk_rel", mods.int], ["skillSle", "chk_sle", mods.dex],
+        ["skillSte", "chk_ste", mods.dex], ["skillSur", "chk_sur", mods.wis]
+    ];
 
-    configurarLinha("saveStr", "chk_saveStr", mods.str, profBonus);
-    configurarLinha("saveDex", "chk_saveDex", mods.dex, profBonus);
-    configurarLinha("saveCon", "chk_saveCon", mods.con, profBonus);
-    configurarLinha("saveInt", "chk_saveInt", mods.int, profBonus);
-    configurarLinha("saveWis", "chk_saveWis", mods.wis, profBonus);
-    configurarLinha("saveCha", "chk_saveCha", mods.cha, profBonus);
-
-    configurarLinha("skillAcro", "chk_acro", mods.dex, profBonus);
-    configurarLinha("skillAni",  "chk_ani",  mods.wis, profBonus);
-    configurarLinha("skillArc",  "chk_arc",  mods.int, profBonus);
-    configurarLinha("skillAth",  "chk_ath",  mods.str, profBonus);
-    configurarLinha("skillDec",  "chk_dec",  mods.cha, profBonus);
-    configurarLinha("skillHis",  "chk_his",  mods.int, profBonus);
-    configurarLinha("skillIns",  "chk_ins",  mods.wis, profBonus);
-    configurarLinha("skillIntim","chk_intim",mods.cha, profBonus);
-    configurarLinha("skillInv",  "chk_inv",  mods.int, profBonus);
-    configurarLinha("skillMed",  "chk_med",  mods.wis, profBonus);
-    configurarLinha("skillNat",  "chk_nat",  mods.int, profBonus);
-    configurarLinha("skillPerc", "chk_perc", mods.wis, profBonus);
-    configurarLinha("skillPerf", "chk_perf", mods.cha, profBonus);
-    configurarLinha("skillPers", "chk_pers", mods.cha, profBonus);
-    configurarLinha("skillRel",  "chk_rel",  mods.int, profBonus);
-    configurarLinha("skillSle",  "chk_sle",  mods.dex, profBonus);
-    configurarLinha("skillSte",  "chk_ste",  mods.dex, profBonus);
-    configurarLinha("skillSur",  "chk_sur",  mods.wis, profBonus);
+    lista.forEach(item => configurarLinha(item[0], item[1], item[2], prof));
 }
 
-function configurarLinha(idTexto, idCheckbox, modBase, profBonus) {
-    const elTexto = document.getElementById(idTexto);
-    const elCheck = document.getElementById(idCheckbox);
+// --- FUNÇÃO CORRIGIDA ---
+function configurarLinha(idTxt, idChk, modBase, profBonus) {
+    const elTxt = document.getElementById(idTxt);
+    // Mudamos 'const' para 'let' para poder atualizar a referência
+    let elChk = document.getElementById(idChk); 
+    if (!elTxt) return;
+
+    let nomeSkill = "Perícia";
+    if (elTxt.previousElementSibling?.className === "skill-name") nomeSkill = elTxt.previousElementSibling.innerText;
+    else if (elTxt.previousElementSibling?.previousElementSibling) nomeSkill = elTxt.previousElementSibling.previousElementSibling.innerText;
+
+    // --- CORREÇÃO DO LISTENER ---
+    // Clonamos o checkbox para limpar listeners antigos
+    const novoChk = elChk.cloneNode(true);
+    elChk.parentNode.replaceChild(novoChk, elChk);
     
-    if (!elTexto) return;
+    // ATUALIZAMOS A VARIÁVEL PARA APONTAR PARA O NOVO ELEMENTO!
+    elChk = novoChk; 
 
-    let nomePericia = "Teste de Perícia";
-    // Tenta achar o nome da perícia no HTML (o span anterior)
-    if (elTexto.previousElementSibling && elTexto.previousElementSibling.className === "skill-name") {
-        nomePericia = elTexto.previousElementSibling.innerText;
-    } else if (elTexto.previousElementSibling && elTexto.previousElementSibling.previousElementSibling) {
-        // Caso tenha o checkbox no meio
-         nomePericia = elTexto.previousElementSibling.previousElementSibling.innerText;
-    }
-
-    function calcular() {
-        let valorFinal = parseInt(modBase); 
-        if (elCheck && elCheck.checked) {
-            valorFinal += profBonus; 
-        }
+    async function calcularESalvar(e) {
+        // Visual
+        let final = parseInt(modBase);
+        if (elChk.checked) final += profBonus; // Agora usa o elChk correto
         
-        const textoFinal = valorFinal >= 0 ? "+" + valorFinal : valorFinal;
-        elTexto.innerText = textoFinal;
-        elTexto.style.color = (elCheck && elCheck.checked) ? "#0056b3" : "#007bff";
+        const txt = final >= 0 ? "+" + final : final;
+        elTxt.innerText = txt;
+        elTxt.style.color = (elChk.checked) ? "#0056b3" : "#007bff";
 
-        // CONFIGURA O CLIQUE
-        elTexto.onclick = function() {
-            rolarDado(nomePericia, valorFinal);
-        };
+        // Salvar (apenas se for evento de mudança)
+        if (e && e.type === 'change') {
+            await salvarProficiencias(); 
+        }
+
+        // Atualiza rolagem
+        elTxt.onclick = () => rolarDado(nomeSkill, final);
     }
 
-    calcular();
-    if (elCheck) elCheck.addEventListener('change', calcular);
+    // Roda inicial (sem evento, só visual)
+    calcularESalvar();
+
+    // Adiciona listener no novo elemento
+    elChk.addEventListener('change', calcularESalvar);
 }
 
-function rolarDado(nome, modificador) {
-    console.log("Tentando rolar:", nome); // Debug no console
-    const d20 = Math.floor(Math.random() * 20) + 1;
-    const total = d20 + modificador;
+async function salvarProficiencias() {
+    if (!idFichaAtual) return;
     
-    let msg = "";
-    if (d20 === 20) msg = " 🔥 CRÍTICO!";
-    if (d20 === 1) msg = " 💀 FALHA CRÍTICA!";
+    const checkboxes = document.querySelectorAll('.prof-check');
+    const marcados = [];
+    checkboxes.forEach(chk => {
+        if (chk.checked) marcados.push(chk.id);
+    });
 
-    alert(`🎲 Rolando ${nome}:\n\nDado: ${d20}\nModificador: ${modificador}\n\nRESULTADO: ${total}${msg}`);
+    try {
+        await updateDoc(doc(db, "fichas", idFichaAtual), { proficiencias: marcados });
+        console.log("Proficiências salvas!");
+    } catch (error) { console.error("Erro ao salvar prof:", error); }
+}
+
+function rolarDado(nome, mod) {
+    if (editando) return;
+    const d20 = Math.floor(Math.random() * 20) + 1;
+    const total = d20 + mod;
+    let msg = ""; if (d20 === 20) msg = " 🔥 CRÍTICO!"; if (d20 === 1) msg = " 💀 FALHA CRÍTICA!";
+    alert(`🎲 ${nome}\nDado: ${d20}\nMod: ${mod}\nTotal: ${total}${msg}`);
 }
