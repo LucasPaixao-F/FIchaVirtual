@@ -400,3 +400,53 @@ button:hover {
       grid-template-columns: 1fr 1fr;
    }
 }
+
+/* --- ESTILOS DA TELA DE CRIAÇÃO --- */
+
+/* Grid para inputs lado a lado (Classe/Raça/HP) */
+.form-row {
+   display: flex;
+   gap: 15px;
+   margin-bottom: 1rem;
+}
+
+.form-row .input-group {
+   flex: 1;
+   /* Faz os itens ocuparem espaço igual */
+   margin-bottom: 0;
+   /* Remove margem extra interna */
+}
+
+/* Grid para os 6 Atributos (3 colunas) */
+.attributes-creation-grid {
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   /* 3 Colunas iguais */
+   gap: 15px;
+   margin-top: 10px;
+}
+
+/* Em celulares, muda para 2 colunas para não ficar apertado */
+@media (max-width: 600px) {
+   .attributes-creation-grid {
+      grid-template-columns: repeat(2, 1fr);
+   }
+}
+
+/* Estilo para os inputs de atributo ficarem destacados */
+.attr-input-box label {
+   text-align: center;
+   font-weight: bold;
+   color: #333;
+}
+
+.attr-input-box input {
+   text-align: center;
+   font-size: 1.2rem;
+   padding: 8px;
+   border: 2px solid #ddd;
+}
+
+.attr-input-box input:focus {
+   border-color: #007bff;
+}

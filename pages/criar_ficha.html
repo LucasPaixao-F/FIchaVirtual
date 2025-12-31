@@ -7,28 +7,19 @@
    <title>Criar Nova Ficha</title>
    <link rel="stylesheet" href="../css/style.css">
    <style>
+      /* Ajuste fino para centralizar o container na tela */
       .ficha-container {
-         max-width: 600px;
-         margin: 2rem auto;
+         max-width: 700px;
+         /* Um pouco mais largo */
+         margin: 3rem auto;
          background: white;
-         padding: 2rem;
-         border-radius: 8px;
-         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-
-      .form-grid {
-         display: grid;
-         grid-template-columns: 1fr 1fr;
-         gap: 15px;
-      }
-
-      .full-width {
-         grid-column: span 2;
+         padding: 2.5rem;
+         border-radius: 12px;
+         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
 
       h2 {
-         text-align: center;
-         color: #333;
+         margin-top: 0;
       }
    </style>
 </head>
@@ -36,15 +27,16 @@
 <body>
    <div class="ficha-container">
       <h2>⚔️ Novo Personagem</h2>
-      <p style="text-align:center; color:#666; margin-bottom:20px;">Preencha os dados básicos para começar.</p>
+      <p style="text-align:center; color:#666; margin-bottom:25px;">Defina a lenda que está prestes a nascer.</p>
 
       <form id="fichaForm">
-         <div class="form-grid">
-            <div class="input-group full-width">
-               <label>Nome do Personagem</label>
-               <input type="text" id="charName" required>
-            </div>
 
+         <div class="input-group">
+            <label>Nome do Personagem</label>
+            <input type="text" id="charName" required placeholder="Ex: Aragorn">
+         </div>
+
+         <div class="form-row">
             <div class="input-group">
                <label>Classe</label>
                <select id="charClass">
@@ -52,8 +44,9 @@
                   <option value="Mago">Mago</option>
                   <option value="Ladino">Ladino</option>
                   <option value="Clérigo">Clérigo</option>
-                  <option value="Arqueiro">Arqueiro</option>
                   <option value="Bardo">Bardo</option>
+                  <option value="Paladino">Paladino</option>
+                  <option value="Bárbaro">Bárbaro</option>
                </select>
             </div>
 
@@ -63,50 +56,43 @@
                   <option value="Humano">Humano</option>
                   <option value="Elfo">Elfo</option>
                   <option value="Anão">Anão</option>
-                  <option value="Orc">Orc</option>
                   <option value="Halfling">Halfling</option>
+                  <option value="Orc">Orc</option>
+                  <option value="Draconato">Draconato</option>
                </select>
             </div>
-
-            <div class="form-grid" style="margin-top: 15px;">
-               <div class="input-group">
-                  <label>Classe de Armadura (CA)</label>
-                  <input type="number" id="armor" value="10">
-               </div>
-               <div class="input-group">
-                  <label>Deslocamento (m)</label>
-                  <input type="text" id="speed" value="9m">
-               </div>
-               <div class="input-group">
-                  <label>Pontos de Vida (Máximo)</label>
-                  <input type="number" id="hpMax" value="10">
-               </div>
-
-               <div class="input-group">
-                  <label>Tipo do Dado de Vida</label>
-                  <select id="dieType">
-                     <option value="d6">d6 (Mago/Feiticeiro)</option>
-                     <option value="d8" selected>d8 (Ladino/Clérigo/Bardo)</option>
-                     <option value="d10">d10 (Guerreiro/Paladino)</option>
-                     <option value="d12">d12 (Bárbaro)</option>
-                  </select>
-               </div>
-            </div>
-            
-            <div class="full-width" ...>
-
-            <div class="full-width" style="border-bottom:1px solid #eee; margin:10px 0;"><strong>Atributos
-                  Iniciais</strong></div>
-
-            <div class="input-group"><label>Força</label><input type="number" id="str" value="10"></div>
-            <div class="input-group"><label>Destreza</label><input type="number" id="dex" value="10"></div>
-            <div class="input-group"><label>Constituição</label><input type="number" id="con" value="10"></div>
-            <div class="input-group"><label>Inteligência</label><input type="number" id="int" value="10"></div>
-            <div class="input-group"><label>Sabedoria</label><input type="number" id="wis" value="10"></div>
-            <div class="input-group"><label>Carisma</label><input type="number" id="cha" value="10"></div>
          </div>
 
-         <button type="submit" style="margin-top:20px;">Salvar e Jogar!</button>
+         <div class="form-row">
+            <div class="input-group">
+               <label>PV Inicial (Vida)</label>
+               <input type="number" id="hpMax" value="10">
+            </div>
+            <div class="input-group">
+               <label>Dado de Vida</label>
+               <select id="dieType">
+                  <option value="d6">d6 (Mago)</option>
+                  <option value="d8" selected>d8 (Ladino/Bardo)</option>
+                  <option value="d10">d10 (Guerreiro)</option>
+                  <option value="d12">d12 (Bárbaro)</option>
+               </select>
+            </div>
+         </div>
+
+         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+         <div style="text-align:center; margin-bottom:10px;"><strong>Distribua os Atributos</strong></div>
+
+         <div class="attributes-creation-grid">
+            <div class="input-group attr-input-box"><label>Força</label><input type="number" id="str" value="10"></div>
+            <div class="input-group attr-input-box"><label>Destreza</label><input type="number" id="dex" value="10"></div>
+            <div class="input-group attr-input-box"><label>Constituição</label><input type="number" id="con" value="10"></div>
+            <div class="input-group attr-input-box"><label>Inteligência</label><input type="number" id="int" value="10"></div>
+            <div class="input-group attr-input-box"><label>Sabedoria</label><input type="number" id="wis" value="10"></div>
+            <div class="input-group attr-input-box"><label>Carisma</label><input type="number" id="cha" value="10"></div>
+         </div>
+
+         <button type="submit" style="margin-top:30px; background-color: #28a745; font-weight: bold;">Salvar e Jogar!</button>
       </form>
    </div>
    <script type="module" src="../js/script.js"></script>

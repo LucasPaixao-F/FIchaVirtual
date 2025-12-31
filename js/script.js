@@ -68,23 +68,32 @@ const fichaForm = document.getElementById('fichaForm');
 if (fichaForm) {
     fichaForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        console.log("Botão clicado! Iniciando salvamento..."); // Para debug
+
         const user = JSON.parse(localStorage.getItem('usuarioLogado'));
-        if (!user) return;
+        if (!user) {
+            alert("Erro: Usuário não logado!");
+            return;
+        }
 
-        const forca = parseInt(document.getElementById('str').value) || 0;
-        const destreza = parseInt(document.getElementById('dex').value) || 0;
-        const constituicao = parseInt(document.getElementById('con').value) || 0;
-        const inteligencia = parseInt(document.getElementById('int').value) || 0;
-        const sabedoria = parseInt(document.getElementById('wis').value) || 0;
-        const carisma = parseInt(document.getElementById('cha').value) || 0;
+        // Tenta pegar os elementos. Se não achar, usa valor 0 para não travar.
+        // O ?.value garante que se o elemento não existir, ele não quebra o código.
+        const forca = parseInt(document.getElementById('str')?.value) || 0;
+        const destreza = parseInt(document.getElementById('dex')?.value) || 0;
+        const constituicao = parseInt(document.getElementById('con')?.value) || 0;
+        const inteligencia = parseInt(document.getElementById('int')?.value) || 0;
+        const sabedoria = parseInt(document.getElementById('wis')?.value) || 0;
+        const carisma = parseInt(document.getElementById('cha')?.value) || 0;
 
+        // TRAVA DE 99 PONTOS
         if(forca > 99 || destreza > 99 || constituicao > 99 || inteligencia > 99 || sabedoria > 99 || carisma > 99) {
             alert("⚠️ Nenhum atributo pode ser maior que 99.");
             return;
         }
 
-        const hpMax = parseInt(document.getElementById('hpMax').value) || 10;
-        const tipoDado = document.getElementById('dieType').value || "d8";
+        // Pega HP e Dado de Vida
+        const hpMax = parseInt(document.getElementById('hpMax')?.value) || 10;
+        const dieType = document.getElementById('dieType')?.value || "d8";
 
         const novaFicha = {
             dono: user.email,
@@ -93,12 +102,14 @@ if (fichaForm) {
             raca: document.getElementById('charRace').value,
             nivel: 1, proficiencias: [],
             
-            armadura: document.getElementById('armor').value || 10,
-            movimento: document.getElementById('speed').value || "9m",
+            // --- AQUI ESTAVA O ERRO ---
+            // Não buscamos mais no HTML, definimos fixo:
+            armadura: 10,      
+            movimento: "9m",   
             
             // VIDA E DADOS DE VIDA
             vidaMaxima: hpMax, vidaAtual: hpMax, vidaTemporaria: 0,
-            dadosVidaAtual: 1, dadosVidaTotal: "1" + tipoDado,
+            dadosVidaAtual: 1, dadosVidaTotal: "1" + dieType,
 
             atributos: {
                 forca: forca, destreza: destreza, constituicao: constituicao,
@@ -107,7 +118,10 @@ if (fichaForm) {
         };
 
         try {
+            console.log("Enviando para o Firebase...", novaFicha);
             await addDoc(collection(db, "fichas"), novaFicha);
+            
+            // Atualiza usuário
             const q = query(collection(db, "usuarios"), where("email", "==", user.email));
             const snap = await getDocs(q);
             if (!snap.empty) {
@@ -115,8 +129,13 @@ if (fichaForm) {
                 user.temFicha = true;
                 localStorage.setItem('usuarioLogado', JSON.stringify(user));
             }
+            
+            alert("Ficha criada com sucesso!");
             window.location.href = "visualizar_ficha.html";
-        } catch (error) { console.error(error); }
+        } catch (error) { 
+            console.error("Erro no Firebase:", error); 
+            alert("Erro ao salvar: " + error.message);
+        }
     });
 }
 
