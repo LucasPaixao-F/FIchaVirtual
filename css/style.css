@@ -514,3 +514,9 @@ button:hover {
    margin-left: auto;
    margin-right: auto;
 }
+.char-avatar {
+   /* ... outras propriedades já existentes ... */
+   object-fit: cover;
+   /* ADICIONE ESTA LINHA PARA FOCAR NO TOPO POR PADRÃO: */
+   object-position: top center;
+}

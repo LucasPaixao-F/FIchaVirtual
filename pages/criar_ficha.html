@@ -31,11 +31,20 @@
 
       <form id="fichaForm">
          
-         <div class="input-group">
-            <label>Link da Imagem (URL)</label>
-            <input type="text" id="imgUrl" placeholder="Cole aqui o link de uma imagem (JPG/PNG)">
-            <small style="color:#888; font-size: 0.8rem;">Dica: Use links do Discord, Imgur ou Pinterest.</small>
+         <div class="form-row">
+            <div class="input-group" style="flex: 3;"> <label>Link da Imagem (URL)</label>
+               <input type="text" id="imgUrl" placeholder="Link da imagem (Discord, Pinterest...)">
+            </div>
+            <div class="input-group" style="flex: 1;"> <label>Foco da Foto</label>
+               <select id="imgPos">
+                  <option value="top" selected>Topo (Rosto)</option>
+                  <option value="center">Centro</option>
+                  <option value="bottom">Base</option>
+               </select>
+            </div>
          </div>
+         <small style="color:#888; font-size: 0.8rem; display:block; margin-top:-10px; margin-bottom: 15px;">Dica: Use "Topo"
+            para retratos onde o rosto está na parte de cima.</small>
          
          <div class="input-group"> ...
 

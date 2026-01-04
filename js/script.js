@@ -79,12 +79,18 @@ if (fichaForm) {
 
         const hpMax = getVal('hpMax') || 10;
         const dieType = document.getElementById('dieType')?.value || "d8";
+        
+        // --- NOVA LÓGICA DE IMAGEM ---
+        const imgUrl = document.getElementById('imgUrl')?.value || "";
+        // Pega a posição escolhida (top, center ou bottom)
+        const imgPos = document.getElementById('imgPos')?.value || "center"; 
 
         const novaFicha = {
             dono: user.email,
             
-            // IMAGEM (NOVO)
-            imagem: document.getElementById('imgUrl')?.value || "",
+            // Salvamos URL e Posição
+            imagem: imgUrl,
+            imagemPosicao: imgPos, 
 
             nome: document.getElementById('charName').value,
             nomeJogador: document.getElementById('playerName')?.value || user.email,
@@ -141,21 +147,34 @@ async function carregarFicha() {
 }
 
 function preencherTela(ficha) {
-    // --- IMAGEM (LÓGICA NOVA) ---
+    // --- VISUALIZAÇÃO DA IMAGEM ---
     const imgEl = document.getElementById('viewImg');
-    // Se tiver link, usa. Se não, usa um boneco padrão cinza
     imgEl.src = ficha.imagem ? ficha.imagem : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
     
-    // Tratamento de erro: se o link quebrar, volta para o padrão
+    // --- APLICA O ENQUADRAMENTO (POSIÇÃO) ---
+    // Se tiver posição salva, usa. Se não, usa 'center' como padrão.
+    const pos = ficha.imagemPosicao || 'center';
+    imgEl.style.objectPosition = pos; // Aplica o estilo CSS diretamente na tag img
+    
     imgEl.onerror = function() { 
         this.src = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"; 
     };
 
-    // Container de edição da imagem
+    // --- EDIÇÃO DA IMAGEM ---
     const imgEditContainer = document.getElementById('editImgContainer');
     if (editando) {
-        // Mostra input para trocar URL
-        imgEditContainer.innerHTML = `<input type="text" id="input_img" class="input-atributo input-image-url" placeholder="Cole o link da imagem aqui" value="${ficha.imagem || ''}">`;
+        // Mostra input de URL e o seletor de posição na edição
+        const currentPos = ficha.imagemPosicao || 'center';
+        imgEditContainer.innerHTML = `
+            <div style="display:flex; gap:5px; margin-top:10px; justify-content:center;">
+                <input type="text" id="input_img" class="input-atributo" style="width:70%; font-size:0.8rem; text-align:left;" placeholder="URL da imagem" value="${ficha.imagem || ''}">
+                <select id="input_img_pos" class="input-atributo" style="width:25%; font-size:0.8rem;">
+                    <option value="top" ${currentPos === 'top' ? 'selected' : ''}>Topo</option>
+                    <option value="center" ${currentPos === 'center' ? 'selected' : ''}>Centro</option>
+                    <option value="bottom" ${currentPos === 'bottom' ? 'selected' : ''}>Base</option>
+                </select>
+            </div>
+        `;
     } else {
         imgEditContainer.innerHTML = '';
     }
@@ -252,10 +271,12 @@ if (painelMestre) {
             
             // Miniatura da imagem no painel do mestre
             const imgUrl = f.imagem || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+            // Aplica a mesma posição na miniatura do mestre
+            const imgPos = f.imagemPosicao || 'center';
 
             card.innerHTML = `
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="${imgUrl}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #333;">
+                    <img src="${imgUrl}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; object-position:${imgPos}; border:2px solid #333;">
                     <div>
                         <h3 style="margin:0; font-size:1.1rem;">${f.nome}</h3>
                         <p style="font-size:0.8rem; color:#555; margin:0;">${f.classe} (Nv. ${f.nivel})</p>
@@ -300,8 +321,9 @@ async function alternarEdicao() {
             const updates = {
                 atributos: { forca:f, destreza:d, constituicao:c, inteligencia:i, sabedoria:w, carisma:ch },
                 
-                // SALVA A IMAGEM NOVA
+                // SALVA A URL E A NOVA POSIÇÃO NA EDIÇÃO
                 imagem: document.getElementById('input_img').value,
+                imagemPosicao: document.getElementById('input_img_pos').value,
 
                 nomeJogador: document.getElementById('input_player').value,
                 antecedente: document.getElementById('input_bg').value,
