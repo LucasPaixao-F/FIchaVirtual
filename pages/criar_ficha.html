@@ -30,10 +30,50 @@
       <p style="text-align:center; color:#666; margin-bottom:25px;">Defina a lenda que está prestes a nascer.</p>
 
       <form id="fichaForm">
+         
+         <div class="input-group">
+            <label>Link da Imagem (URL)</label>
+            <input type="text" id="imgUrl" placeholder="Cole aqui o link de uma imagem (JPG/PNG)">
+            <small style="color:#888; font-size: 0.8rem;">Dica: Use links do Discord, Imgur ou Pinterest.</small>
+         </div>
+         
+         <div class="input-group"> ...
 
          <div class="input-group">
             <label>Nome do Personagem</label>
             <input type="text" id="charName" required placeholder="Ex: Aragorn">
+         </div>
+
+         <div class="form-row">
+            <div class="input-group">
+               <label>Nome do Jogador</label>
+               <input type="text" id="playerName" placeholder="Seu nome real">
+            </div>
+            <div class="input-group">
+               <label>Antecedente</label>
+               <input type="text" id="background" placeholder="Ex: Criminoso, Soldado...">
+            </div>
+         </div>
+         
+         <div class="form-row">
+            <div class="input-group">
+               <label>Alinhamento</label>
+               <select id="alignment">
+                  <option value="Neutro">Neutro</option>
+                  <option value="Leal Bom">Leal Bom</option>
+                  <option value="Neutro Bom">Neutro Bom</option>
+                  <option value="Caótico Bom">Caótico Bom</option>
+                  <option value="Leal Neutro">Leal Neutro</option>
+                  <option value="Caótico Neutro">Caótico Neutro</option>
+                  <option value="Leal Mau">Leal Mau</option>
+                  <option value="Neutro Mau">Neutro Mau</option>
+                  <option value="Caótico Mau">Caótico Mau</option>
+               </select>
+            </div>
+            <div class="input-group">
+               <label>XP Inicial</label>
+               <input type="number" id="xp" value="0">
+            </div>
          </div>
 
          <div class="form-row">

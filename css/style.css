@@ -450,3 +450,67 @@ button:hover {
 .attr-input-box input:focus {
    border-color: #007bff;
 }
+
+.header-info-grid {
+   display: grid;
+   /* Cria colunas que se ajustam sozinhas (minimo 120px cada) */
+   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+   gap: 10px;
+   background-color: #f8f9fa;
+   padding: 10px;
+   border-radius: 8px;
+   margin-bottom: 20px;
+   border: 1px solid #eee;
+}
+
+.info-box {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+}
+
+.info-label {
+   font-size: 0.7rem;
+   text-transform: uppercase;
+   color: #888;
+   font-weight: bold;
+   margin-bottom: 2px;
+}
+
+.info-val {
+   font-weight: 600;
+   color: #333;
+   font-size: 0.95rem;
+   text-align: center;
+}
+
+/* --- FOTO DO PERSONAGEM --- */
+.avatar-container {
+   display: flex;
+   justify-content: center;
+   margin-bottom: 15px;
+}
+
+.char-avatar {
+   width: 120px;
+   height: 120px;
+   border-radius: 50%;
+   /* Faz ficar redonda */
+   object-fit: cover;
+   /* Garante que a imagem não estique */
+   border: 3px solid #333;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+   background-color: #eee;
+}
+
+/* Input de URL que só aparece na edição */
+.input-image-url {
+   width: 80%;
+   margin-top: 10px;
+   font-size: 0.8rem;
+   text-align: center;
+   display: block;
+   margin-left: auto;
+   margin-right: auto;
+}

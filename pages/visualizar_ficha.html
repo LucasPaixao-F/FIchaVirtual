@@ -40,12 +40,44 @@
    <div class="ficha-card" id="visualizarFicha">
 
       <button id="btnEditar" class="btn-topo-direita" onclick="alternarEdicao()">✏️ Editar</button>
+      
+      <div class="avatar-container">
+         <div style="text-align:center; width: 100%;">
+            <img src="https://via.placeholder.com/150" id="viewImg" class="char-avatar" alt="Personagem">
+      
+            <div id="editImgContainer"></div>
+         </div>
+      </div>
 
       <div class="header-ficha">
          <h2 id="viewName">Carregando...</h2>
-         <p class="sub-header">
-            <span id="viewRace">-</span> | <span id="viewClass">-</span>
-         </p>
+         
+         <div class="header-info-grid">
+            <div class="info-box">
+               <span class="info-label">Jogador</span>
+               <span class="info-val" id="viewPlayerName">-</span>
+            </div>
+            <div class="info-box">
+               <span class="info-label">Raça</span>
+               <span class="info-val" id="viewRace">-</span>
+            </div>
+            <div class="info-box">
+               <span class="info-label">Classe</span>
+               <span class="info-val" id="viewClass">-</span>
+            </div>
+            <div class="info-box">
+               <span class="info-label">Antecedente</span>
+               <span class="info-val" id="viewBackground">-</span>
+            </div>
+            <div class="info-box">
+               <span class="info-label">Alinhamento</span>
+               <span class="info-val" id="viewAlignment">-</span>
+            </div>
+            <div class="info-box">
+               <span class="info-label">XP</span>
+               <span class="info-val" id="viewXp">0</span>
+            </div>
+         </div>
 
          <div class="badges-row">
             <div class="badge bg-dark">
